@@ -1,0 +1,16 @@
+[project]
+name = "ai-agents-capstone"
+version = "0.1.0"
+description = "5-Day AI Agents Intensive Capstone Project"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai>=1.0.0",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.10.0",
+    "rich>=13.9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
