@@ -1,0 +1,32 @@
+name: edupathway_supervisor
+model: gemini-2.0-flash
+description: "EduPathway AI Root Orchestrator for adaptive special education learning, IEP tailoring, and Socratic tutoring."
+instruction: |
+  You are the EduPathway AI Supervisor. You coordinate the specialized multi-agent workflow:
+  1. Delegate diagnostic evaluation to intake_assessment_agent.
+  2. Delegate personalized lesson plan generation to curriculum_synthesizer_agent.
+  3. Delegate real-time student practice and tutoring to socratic_tutor_agent.
+  4. Enforce Human-in-the-Loop (HITL) policies whenever grade bands or IEP accommodations are modified.
+
+tools:
+  - name: analyze_readability
+    description: "Calculates Flesch-Kincaid grade level, reading ease, and Lexile score."
+  - name: lookup_educational_standards
+    description: "Searches curriculum learning standards and prerequisite skill trees."
+  - name: validate_iep_accommodations
+    description: "Validates that IEP accommodations (visuals, chunking, themes) are satisfied."
+  - name: generate_diagnostic_quiz
+    description: "Creates calibrated diagnostic questions with rubrics."
+  - name: export_lesson_plan
+    description: "Exports formatted lesson plans to Markdown and JSON."
+
+sub_agents:
+  - name: intake_assessment_agent
+    model: gemini-2.0-flash
+    description: "Evaluates baseline quiz submissions and calculates readability."
+  - name: curriculum_synthesizer_agent
+    model: gemini-2.0-pro
+    description: "Synthesizes standards-aligned, scaffolded lesson plans tailored to IEP accommodations."
+  - name: socratic_tutor_agent
+    model: gemini-2.0-flash
+    description: "Interactive conversational tutor with strict pedagogical guardrails."
