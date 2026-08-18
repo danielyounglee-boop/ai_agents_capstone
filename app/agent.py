@@ -28,6 +28,15 @@ from src.ai_agents_capstone.tools.standards import lookup_educational_standards
 from src.ai_agents_capstone.tools.accommodations import validate_iep_accommodations
 from src.ai_agents_capstone.tools.assessment_tool import generate_diagnostic_quiz
 from src.ai_agents_capstone.tools.exporter import export_lesson_plan
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Automatically configure Google Cloud Vertex AI if no Gemini API Key is provided
+if not os.getenv("GEMINI_API_KEY"):
+    os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "true")
+    os.environ.setdefault("GOOGLE_CLOUD_PROJECT", os.getenv("GCP_PROJECT_ID", "ai-in-5-days-dyl-temp"))
+    os.environ.setdefault("GOOGLE_CLOUD_LOCATION", os.getenv("GCP_LOCATION", "us-central1"))
 
 MODEL_FAST = os.getenv("MODEL_FAST", "gemini-3.6-flash")
 MODEL_REASONING = os.getenv("MODEL_REASONING", "gemini-3.6-pro")
