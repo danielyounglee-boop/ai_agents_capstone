@@ -18,6 +18,21 @@ def test_session_memory_rolling_buffer():
     assert len(memory.summarized_context) > 0
 
 
+@pytest.mark.asyncio
+async def test_session_memory_background_compaction():
+    """Verify asynchronous background compaction worker execution."""
+    memory = SessionMemory(session_id="test_async_sess", max_messages=4)
+    for i in range(6):
+        memory.add_message(role="user", content=f"Async message {i}")
+    
+    memory.schedule_background_compaction()
+    # Allow background worker to complete
+    import asyncio
+    await asyncio.sleep(0.05)
+    assert len(memory.messages) <= 4
+    assert len(memory.summarized_context) > 0
+
+
 def test_student_profile_store(tmp_path):
     store_dir = tmp_path / "profiles"
     store = StudentProfileStore(storage_dir=str(store_dir))

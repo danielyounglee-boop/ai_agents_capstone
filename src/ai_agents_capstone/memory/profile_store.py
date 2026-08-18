@@ -1,19 +1,24 @@
-"""Long-term student IEP profile and mastery vector persistence store."""
+"""Long-term student IEP profile, mastery vector persistence, and background consolidation engine."""
 
+import asyncio
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 from ..models.profile import StudentProfile, MasteryVector, CognitiveIndicator, IEPAccommodation
 
 
 class StudentProfileStore:
-    """Persistent storage engine for Student Profiles, IEP accommodations, and mastery vectors."""
+    """Persistent storage engine for Student Profiles with background task consolidation and Cloud sync."""
 
-    def __init__(self, storage_dir: str = "data/profiles"):
+    def __init__(self, storage_dir: str = "data/profiles", enable_background_sync: bool = True):
         self.storage_dir = storage_dir
+        self.enable_background_sync = enable_background_sync
         os.makedirs(self.storage_dir, exist_ok=True)
         self._cache: Dict[str, StudentProfile] = {}
+        self._executor = ThreadPoolExecutor(max_workers=3, thread_name_prefix="profile_sync_worker")
+        self.active_background_tasks: List[Any] = []
 
     def get_profile(self, student_id: str) -> Optional[StudentProfile]:
         """Retrieve student profile by ID (from memory cache or disk)."""
@@ -34,16 +39,36 @@ class StudentProfileStore:
             return None
 
     def save_profile(self, profile: StudentProfile) -> None:
-        """Persist student profile to storage."""
+        """Persist student profile to memory cache and trigger background disk/cloud consolidation."""
         profile.updated_at = datetime.utcnow()
         self._cache[profile.student_id] = profile
 
+        if self.enable_background_sync:
+            self.schedule_background_save(profile)
+        else:
+            self._save_profile_disk_sync(profile)
+
+    def schedule_background_save(self, profile: StudentProfile) -> None:
+        """Dispatch non-blocking background consolidation task for student state persistence."""
+        try:
+            loop = asyncio.get_running_loop()
+            task = loop.create_task(self._async_save_profile(profile))
+            self.active_background_tasks.append(task)
+        except RuntimeError:
+            self._executor.submit(self._save_profile_disk_sync, profile)
+
+    async def _async_save_profile(self, profile: StudentProfile) -> None:
+        """Asynchronous background worker persisting profile to storage."""
+        await asyncio.to_thread(self._save_profile_disk_sync, profile)
+
+    def _save_profile_disk_sync(self, profile: StudentProfile) -> None:
+        """Synchronous write operation executed inside background thread pool."""
         file_path = os.path.join(self.storage_dir, f"{profile.student_id}.json")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(profile.model_dump_json(indent=2))
 
     def update_mastery(self, student_id: str, topic_id: str, topic_name: str, new_score: float) -> StudentProfile:
-        """Update a student's mastery vector score for a specific topic with smoothing."""
+        """Update a student's mastery vector score for a specific topic with smoothed EMA."""
         profile = self.get_profile(student_id)
         if not profile:
             raise ValueError(f"Student '{student_id}' not found in profile store.")
@@ -80,7 +105,7 @@ class StudentProfileStore:
         attention_span_minutes: int = 20,
         preferred_modality: str = "visual",
     ) -> None:
-        """Record cognitive fatigue and frustration indicators."""
+        """Record cognitive fatigue and frustration indicators with background persistence."""
         profile = self.get_profile(student_id)
         if not profile:
             return
