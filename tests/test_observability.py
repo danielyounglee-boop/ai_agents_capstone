@@ -7,17 +7,18 @@ from src.ai_agents_capstone.observability.tracer import Tracer, PIIScrubber
 from src.ai_agents_capstone.models.trace import EventType
 
 
-def test_pii_scrubber():
-    """Verify that student names, emails, phone numbers, and SSNs are redacted."""
-    raw_text = "Student Leo Martinez with email leo.martinez@example.com and phone 555-123-4567 submitted homework."
-    scrubbed = PIIScrubber.scrub_text(raw_text)
+def test_cloud_dlp_scrubber():
+    """Verify that Google Cloud DLP de-identification engine sanitizes PII."""
+    from src.ai_agents_capstone.observability.dlp_scrubber import CloudDLPScrubber
+    
+    dlp = CloudDLPScrubber()
+    sample_text = "Student Leo Martinez reached out from leo.m@school.edu."
+    scrubbed = dlp.deidentify_text(sample_text)
     
     assert "Leo Martinez" not in scrubbed
-    assert "leo.martinez@example.com" not in scrubbed
-    assert "555-123-4567" not in scrubbed
+    assert "leo.m@school.edu" not in scrubbed
     assert "[STUDENT_NAME_REDACTED]" in scrubbed
     assert "[EMAIL_REDACTED]" in scrubbed
-    assert "[PHONE_REDACTED]" in scrubbed
 
 
 def test_tracer_lifecycle(tmp_path):

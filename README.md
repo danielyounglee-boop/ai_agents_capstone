@@ -91,11 +91,11 @@ flowchart TD
 
 | Rubric Pillar | Score Target | Implementation in EduPathway AI |
 | :--- | :---: | :--- |
-| **1. Tool & Interface Design** | **20 / 20** | • 5 modular custom tools with strict Pydantic parameter validation and docstrings.<br/>• Readability analyzer, standards lookup, IEP validator, quiz generator, and lesson exporter.<br/>• Rich interactive CLI with color-coded dialogue boxes and progress indicators. |
+| **1. Tool & Interface Design** | **20 / 20** | • 5 modular custom tools with strict Pydantic schemas, docstrings, and **guided error recovery**.<br/>• Readability analyzer, standards lookup, IEP accommodations validator, diagnostic quiz generator, and lesson exporter.<br/>• Rich interactive CLI & ADK 2.0 Web Playground (`agents-cli playground`). |
 | **2. Context & Memory** | **20 / 20** | • Rolling session memory buffer with automatic context compression.<br/>• Long-term persistent Student Profile store with skill mastery vectors (`0.0` - `1.0`), accommodation histories, and cognitive load trends across sessions. |
 | **3. Orchestration & Logic** | **20 / 20** | • State machine coordinating Intake $\to$ Curriculum $\to$ HITL Guard $\to$ Socratic Tutor.<br/>• Strict pedagogical guardrails (never reveals answers; 3-tier scaffolding hints).<br/>• Human-in-the-Loop policy gate requiring educator sign-off before modifying accommodations or grade bands. |
-| **4. Observability & Tracing** | **20 / 20** | • Structured event tracer recording agent handoffs, tool timings/inputs/outputs, token usage, and latency.<br/>• Timestamped JSON trace logs exported to `traces/` for auditing and compliance. |
-| **5. Infrastructure & CI/CD** | **15 / 15** | • GitHub Actions workflow (`.github/workflows/ci.yml`) for linting (`ruff`), unit tests (`pytest`), and automated eval benchmark scoring.<br/>• Production `Dockerfile` and `docker-compose.yml`. |
+| **4. Observability & Tracing** | **20 / 20** | • **Google Cloud Sensitive Data Protection (Cloud DLP)** and automated PII scrubbing (redacting student names, emails, phones, SSNs).<br/>• **Intent vs. Outcome logging:** Explicit `INTENT_DECLARED` events recorded before executing tools and agents.<br/>• Timestamped JSON trace logs exported to `traces/` with token & latency analytics. |
+| **5. Infrastructure & CI/CD** | **15 / 15** | • GitHub Actions workflow (`.github/workflows/ci.yml`) for linting (`ruff`), unit tests (`pytest`), and automated eval benchmark scoring.<br/>• Official ADK evaluation dataset (`tests/eval/`) and production `Dockerfile` / Agent Runtime deployment. |
 
 ---
 

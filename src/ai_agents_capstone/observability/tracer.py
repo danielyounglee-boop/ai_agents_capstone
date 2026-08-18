@@ -52,12 +52,16 @@ class PIIScrubber:
             return cls.scrub_text(str(data))
 
 
+from .dlp_scrubber import CloudDLPScrubber
+
+
 class Tracer:
     """Central event collector, telemetry recorder, intent logger, and structured trace exporter."""
 
     def __init__(self, session_id: str, student_id: str, enable_pii_redaction: bool = True):
         self.enable_pii_redaction = enable_pii_redaction
-        scrubbed_student_id = PIIScrubber.scrub_text(student_id) if enable_pii_redaction else student_id
+        self.dlp_scrubber = CloudDLPScrubber()
+        scrubbed_student_id = self.dlp_scrubber.deidentify_text(student_id) if enable_pii_redaction else student_id
         
         self.session_trace = SessionTrace(
             session_id=session_id,
@@ -69,7 +73,11 @@ class Tracer:
         
         self.emit_event(
             EventType.SESSION_START,
-            {"student_id": scrubbed_student_id, "pii_redaction_active": enable_pii_redaction}
+            {
+                "student_id": scrubbed_student_id,
+                "pii_redaction_active": enable_pii_redaction,
+                "dlp_engine": "Google Cloud Sensitive Data Protection (DLP v2)",
+            }
         )
 
     def record_intent(
@@ -88,7 +96,7 @@ class Tracer:
             "context": context or {},
         }
         if self.enable_pii_redaction:
-            payload = PIIScrubber.scrub_data(payload)
+            payload = self.dlp_scrubber.deidentify_data(payload)
 
         return self.emit_event(
             EventType.INTENT_DECLARED,
@@ -103,9 +111,9 @@ class Tracer:
         agent_name: Optional[str] = None,
         duration_ms: Optional[float] = None,
     ) -> TraceEvent:
-        """Emit a timestamped timeline trace event with automated PII scrubbing."""
+        """Emit a timestamped timeline trace event with automated Google Cloud DLP PII scrubbing."""
         event_id = f"evt_{len(self.session_trace.events) + 1:04d}"
-        clean_payload = PIIScrubber.scrub_data(payload or {}) if self.enable_pii_redaction else (payload or {})
+        clean_payload = self.dlp_scrubber.deidentify_data(payload or {}) if self.enable_pii_redaction else (payload or {})
         
         event = TraceEvent(
             event_id=event_id,
@@ -129,9 +137,9 @@ class Tracer:
         error_message: Optional[str] = None,
         agent_name: Optional[str] = None,
     ) -> ToolExecutionTrace:
-        """Record a completed tool execution with latency, input/output validation, and PII scrubbing."""
-        clean_inputs = PIIScrubber.scrub_data(inputs) if self.enable_pii_redaction else inputs
-        clean_output = PIIScrubber.scrub_data(output) if self.enable_pii_redaction else output
+        """Record a completed tool execution with latency, input/output validation, and Google Cloud DLP PII scrubbing."""
+        clean_inputs = self.dlp_scrubber.deidentify_data(inputs) if self.enable_pii_redaction else inputs
+        clean_output = self.dlp_scrubber.deidentify_data(output) if self.enable_pii_redaction else output
 
         tool_trace = ToolExecutionTrace(
             tool_name=tool_name,
