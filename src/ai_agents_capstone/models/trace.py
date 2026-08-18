@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 class EventType(str, Enum):
     """Types of telemetry events emitted across the multi-agent pipeline."""
 
+    INTENT_DECLARED = "INTENT_DECLARED"
     SESSION_START = "SESSION_START"
     SESSION_END = "SESSION_END"
     AGENT_START = "AGENT_START"
@@ -20,6 +21,7 @@ class EventType(str, Enum):
     HITL_RESOLVED = "HITL_RESOLVED"
     STATE_TRANSITION = "STATE_TRANSITION"
     MEMORY_UPDATE = "MEMORY_UPDATE"
+    DATA_SCRUBBED = "DATA_SCRUBBED"
 
 
 class ToolExecutionTrace(BaseModel):

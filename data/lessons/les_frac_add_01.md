@@ -1,5 +1,5 @@
 # 📚 Cosmic Fractions: Navigating Unlike Denominators with Space Stations
-**Student ID:** `std_sample_01` | **Target Skill:** Adding fractions with unlike denominators using visual fraction bars | **Target Reading Grade Level:** 3.8
+**Student ID:** `leo_m` | **Target Skill:** Adding fractions with unlike denominators using visual fraction bars | **Target Reading Grade Level:** 3.8
 
 ## 🎯 Aligned Educational Standards
 - **CCSS.MATH.CONTENT.5.NF.A.1:** Add and subtract fractions with unlike denominators by finding common denominators.
@@ -50,4 +50,4 @@ Look at the visual fraction bar: 1/2 is the exact same length as 2/4. When we re
 
 ## 👩‍🏫 Educator / IEP Specialist Notes
 
-Lesson plan integrates high-interest space theme, chunked steps, and visual representations for dyslexia/ADHD support. [Note: Accommodations check: 50.0% compliant. Recommendations: Missing 'chunked_instructions': Content must be broken down into numbered discrete sub-steps. (Add elements like: step 1, step 2, part a); Missing 'scaffolded_hinting': Provides tiered hints without giving direct solutions. (Add elements like: hint, guiding question, consider)]
+Lesson plan integrates high-interest space theme, chunked steps, and visual representations for dyslexia/ADHD support. [Note: Accommodations check: 50.0% compliant. Recommendations: Remediation for 'chunked_instructions': Content must be broken down into numbered discrete sub-steps. (Incorporate keywords/concepts: step 1, step 2, part a); Remediation for 'scaffolded_hinting': Provides tiered hints without giving direct solutions. (Incorporate keywords/concepts: hint, guiding question, consider)]

@@ -1,4 +1,4 @@
-"""Educational standards lookup and prerequisite tree mapping tool."""
+"""Educational standards lookup and prerequisite tree mapping tool with guided error recovery."""
 
 from typing import List, Dict, Any, Optional
 
@@ -73,7 +73,7 @@ def lookup_educational_standards(
     topic: Optional[str] = None,
     keyword: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Search and retrieve curriculum standards by grade, subject, topic, or keyword.
+    """Search and retrieve curriculum standards by grade, subject, topic, or keyword with guided recovery.
 
     Args:
         grade_level: Target grade level (1-12).
@@ -82,8 +82,20 @@ def lookup_educational_standards(
         keyword: Free-text search across titles and descriptions.
 
     Returns:
-        List of matching standard definitions with prerequisites and key vocabulary.
+        List of matching standard definitions, or a guided error recovery object if no match found.
     """
+    # Parameter sanity checks
+    if grade_level is not None and (not isinstance(grade_level, int) or grade_level < 1 or grade_level > 12):
+        return [
+            {
+                "status": "error_guided_recovery",
+                "error_code": "INVALID_GRADE_LEVEL",
+                "error_message": f"Grade level {grade_level} is invalid. Supported grades are 1 through 12.",
+                "guided_recovery": "Please specify an integer grade level between 1 and 12 (e.g. grade_level=5 for 5th grade).",
+                "available_grades": [3, 4, 5, 6],
+            }
+        ]
+
     results = []
     for standard in CURRICULUM_STANDARDS:
         if grade_level is not None and standard["grade_level"] != grade_level:
@@ -99,10 +111,23 @@ def lookup_educational_standards(
                 continue
         results.append(standard)
 
-    # If no exact match found, return the closest matching subject/topic
+    # Fallback to closest subject/topic if no strict match
     if not results and (subject or topic):
         for standard in CURRICULUM_STANDARDS:
             if (subject and subject.lower() in standard["subject"].lower()) or (topic and topic.lower() in standard["topic"].lower()):
                 results.append(standard)
+
+    # Guided Recovery if still empty
+    if not results:
+        return [
+            {
+                "status": "error_guided_recovery",
+                "error_code": "NO_STANDARDS_FOUND",
+                "error_message": f"No curriculum standards found matching criteria (grade={grade_level}, subject='{subject}', topic='{topic}', keyword='{keyword}').",
+                "guided_recovery": "Try searching with topic='fractions' or topic='reading_comprehension', or omitting the keyword filter.",
+                "available_topics": ["fractions", "reading_comprehension"],
+                "available_grades": [3, 4, 5, 6],
+            }
+        ]
 
     return results

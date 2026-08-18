@@ -77,9 +77,12 @@ class CurriculumSynthesizerAgent(BaseAgent):
 
         try:
             data = json.loads(response_text)
+            data["student_id"] = profile.student_id
             lesson = LessonPlan.model_validate(data)
         except Exception:
             lesson = self._fallback_lesson(report, profile, aligned_standards)
+
+        lesson.student_id = profile.student_id
 
         # 4. Validate IEP accommodations using Tool
         full_lesson_text = (

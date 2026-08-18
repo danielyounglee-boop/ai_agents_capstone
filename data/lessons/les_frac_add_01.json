@@ -1,6 +1,6 @@
 {
   "lesson_id": "les_frac_add_01",
-  "student_id": "std_sample_01",
+  "student_id": "leo_m",
   "title": "Cosmic Fractions: Navigating Unlike Denominators with Space Stations",
   "subject": "Mathematics",
   "target_skill": "Adding fractions with unlike denominators using visual fraction bars",
@@ -62,7 +62,7 @@
       "visual_aid_description": "Grid partitioned into 10 equal cells."
     }
   ],
-  "educator_notes": "Lesson plan integrates high-interest space theme, chunked steps, and visual representations for dyslexia/ADHD support. [Note: Accommodations check: 50.0% compliant. Recommendations: Missing 'chunked_instructions': Content must be broken down into numbered discrete sub-steps. (Add elements like: step 1, step 2, part a); Missing 'scaffolded_hinting': Provides tiered hints without giving direct solutions. (Add elements like: hint, guiding question, consider)]",
+  "educator_notes": "Lesson plan integrates high-interest space theme, chunked steps, and visual representations for dyslexia/ADHD support. [Note: Accommodations check: 50.0% compliant. Recommendations: Remediation for 'chunked_instructions': Content must be broken down into numbered discrete sub-steps. (Incorporate keywords/concepts: step 1, step 2, part a); Remediation for 'scaffolded_hinting': Provides tiered hints without giving direct solutions. (Incorporate keywords/concepts: hint, guiding question, consider)]",
   "requires_hitl_approval": false,
   "hitl_reason": null,
   "created_at": "2026-08-18 00:00:00+00:00"

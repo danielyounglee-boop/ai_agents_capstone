@@ -1,4 +1,4 @@
-"""IEP Accommodations compliance validator tool."""
+"""IEP Accommodations compliance validator tool with guided error recovery."""
 
 from typing import List, Dict, Any
 
@@ -31,20 +31,47 @@ def validate_iep_accommodations(
     lesson_content: str,
     required_accommodations: List[str],
 ) -> Dict[str, Any]:
-    """Validate that generated lesson content or practice set adheres to a student's IEP accommodations.
+    """Validate that generated lesson content adheres to student IEP accommodations with guided recovery.
 
     Args:
         lesson_content: The text content, instructions, or exercises generated for the student.
-        required_accommodations: List of accommodation keys or descriptions (e.g. ['visual_scaffolding', 'chunked_instructions']).
+        required_accommodations: List of accommodation keys (e.g. ['visual_scaffolding', 'chunked_instructions']).
 
     Returns:
-        Dictionary with:
+        Dictionary with compliance score and guided recovery instructions for remediating missing accommodations:
             - is_compliant: Boolean flag.
             - compliance_score: Percentage score (0-100%).
             - passed_accommodations: List of satisfied accommodations.
             - missing_accommodations: List of accommodations that need remediation.
             - recommendations: Actionable fixes for missing accommodations.
+            - guided_recovery: Step-by-step guidance for the agent to rewrite content to satisfy missing rules.
     """
+    if not isinstance(lesson_content, str) or not lesson_content.strip():
+        return {
+            "status": "error_guided_recovery",
+            "error_code": "EMPTY_LESSON_CONTENT",
+            "error_message": "Lesson content must be a non-empty string to validate accommodations.",
+            "guided_recovery": "Pass the full drafted lesson text into validate_iep_accommodations.",
+            "is_compliant": False,
+            "compliance_score": 0.0,
+            "passed_accommodations": [],
+            "missing_accommodations": required_accommodations or [],
+            "recommendations": ["Provide drafted lesson content for compliance analysis."],
+        }
+
+    if not isinstance(required_accommodations, list):
+        return {
+            "status": "error_guided_recovery",
+            "error_code": "INVALID_ACCOMMODATION_LIST",
+            "error_message": "required_accommodations must be a list of strings.",
+            "guided_recovery": "Provide accommodations as a list of strings, e.g. ['visual_scaffolding', 'chunked_instructions'].",
+            "is_compliant": True,
+            "compliance_score": 100.0,
+            "passed_accommodations": [],
+            "missing_accommodations": [],
+            "recommendations": [],
+        }
+
     content_lower = lesson_content.lower()
     passed = []
     missing = []
@@ -52,11 +79,13 @@ def validate_iep_accommodations(
 
     if not required_accommodations:
         return {
+            "status": "success",
             "is_compliant": True,
             "compliance_score": 100.0,
             "passed_accommodations": [],
             "missing_accommodations": [],
             "recommendations": ["No formal IEP accommodations required."],
+            "guided_recovery": "All standard parameters met.",
         }
 
     for acc in required_accommodations:
@@ -74,7 +103,7 @@ def validate_iep_accommodations(
                 else:
                     missing.append(acc)
                     recommendations.append(
-                        f"Missing '{acc}': {rule['description']} (Add elements like: {', '.join(rule['keywords'][:3])})"
+                        f"Remediation for '{acc}': {rule['description']} (Incorporate keywords/concepts: {', '.join(rule['keywords'][:3])})"
                     )
                     matched = True
                     break
@@ -86,15 +115,23 @@ def validate_iep_accommodations(
                 passed.append(acc)
             else:
                 missing.append(acc)
-                recommendations.append(f"Ensure explicit application of accommodation: '{acc}'.")
+                recommendations.append(f"Ensure explicit inclusion of accommodation element: '{acc}'.")
 
     score = round((len(passed) / len(required_accommodations)) * 100.0, 1) if required_accommodations else 100.0
     is_compliant = len(missing) == 0
 
+    guided_recovery = (
+        "Content successfully satisfies all student accommodations."
+        if is_compliant
+        else f"To achieve 100% compliance, revise the lesson to address the {len(missing)} missing items: {', '.join(missing)}."
+    )
+
     return {
+        "status": "success" if is_compliant else "needs_remediation",
         "is_compliant": is_compliant,
         "compliance_score": score,
         "passed_accommodations": passed,
         "missing_accommodations": missing,
         "recommendations": recommendations,
+        "guided_recovery": guided_recovery,
     }

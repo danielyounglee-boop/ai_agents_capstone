@@ -1,4 +1,4 @@
-"""Diagnostic quiz generator tool for baseline student assessment."""
+"""Diagnostic quiz generator tool for baseline student assessment with guided error recovery."""
 
 from typing import Dict, Any, List
 
@@ -78,16 +78,31 @@ def generate_diagnostic_quiz(
     grade_level: int = 5,
     num_questions: int = 3,
 ) -> Dict[str, Any]:
-    """Generate a calibrated diagnostic quiz for baseline skill evaluation.
+    """Generate a calibrated diagnostic quiz for baseline skill evaluation with guided error recovery.
 
     Args:
         topic: The topic key or search term (e.g. 'fractions_addition_unlike_denominators' or 'fractions').
         grade_level: Grade level target (1-12).
-        num_questions: Number of questions to include.
+        num_questions: Number of questions to include (1-10).
 
     Returns:
-        Dictionary containing quiz_id, topic, grade_level, questions, and rubric.
+        Dictionary containing quiz_id, topic, grade_level, questions, rubric, and guided recovery info.
     """
+    if not isinstance(topic, str) or not topic.strip():
+        return {
+            "status": "error_guided_recovery",
+            "error_code": "INVALID_TOPIC",
+            "error_message": "Topic must be a non-empty string.",
+            "guided_recovery": "Specify a learning topic such as 'fractions' or 'reading_comprehension'.",
+            "available_topics": list(DIAGNOSTIC_BANK.keys()),
+            "quiz_id": "quiz_fallback",
+            "topic": "fractions_addition_unlike_denominators",
+            "grade_level": grade_level,
+            "question_count": 0,
+            "questions": [],
+            "rubric": {},
+        }
+
     topic_normalized = topic.lower().replace(" ", "_").replace("-", "_")
 
     # Match key
@@ -99,10 +114,14 @@ def generate_diagnostic_quiz(
 
     if not matched_key:
         matched_key = "fractions_addition_unlike_denominators"
+        recovery_note = f"Topic '{topic}' was mapped to closest baseline bank: '{matched_key}'."
+    else:
+        recovery_note = "Exact diagnostic bank match found."
 
-    questions = DIAGNOSTIC_BANK[matched_key][:num_questions]
+    questions = DIAGNOSTIC_BANK[matched_key][: max(1, min(10, num_questions))]
 
     return {
+        "status": "success",
         "quiz_id": f"quiz_{matched_key}_gr{grade_level}",
         "topic": matched_key,
         "grade_level": grade_level,
@@ -113,4 +132,5 @@ def generate_diagnostic_quiz(
             "partial_threshold": 0.5,
             "diagnostic_focus": "Identify conceptual vs procedural errors and reading barriers.",
         },
+        "guided_recovery": recovery_note,
     }

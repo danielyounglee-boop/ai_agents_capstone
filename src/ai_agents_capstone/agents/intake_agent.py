@@ -59,9 +59,12 @@ class IntakeAssessmentAgent(BaseAgent):
 
         try:
             data = json.loads(response_text)
+            data["student_id"] = submission.student_id
             report = AssessmentReport.model_validate(data)
         except Exception:
             report = self._fallback_report(submission, assessed_reading_level)
+
+        report.student_id = submission.student_id
 
         return report
 

@@ -1,4 +1,4 @@
-"""EduPathway Multi-Agent Supervisor and State Machine Orchestrator."""
+"""EduPathway Multi-Agent Supervisor and State Machine Orchestrator with Intent Logging."""
 
 import os
 import uuid
@@ -41,7 +41,7 @@ class EduPathwaySupervisor:
     ) -> Dict[str, Any]:
         """Execute the end-to-end multi-agent pipeline from Diagnostic to Lesson Plan Synthesis."""
         sess_id = session_id or f"sess_{uuid.uuid4().hex[:8]}"
-        tracer = Tracer(session_id=sess_id, student_id=submission.student_id)
+        tracer = Tracer(session_id=sess_id, student_id=submission.student_id, enable_pii_redaction=True)
         tracer.record_state_transition("INIT", "DIAGNOSTIC_ASSESSMENT")
 
         # 1. Load or initialize profile
@@ -56,8 +56,13 @@ class EduPathwaySupervisor:
             )
             self.profile_store.save_profile(profile)
 
-        # 2. Intake & Assessment Agent
-        tracer.emit_event(tracer.session_trace.events[0].event_type.AGENT_START, {"agent": "IntakeAssessmentAgent"})
+        # 2. Declare Intent & Run Intake Assessment Agent
+        tracer.record_intent(
+            agent_name="IntakeAssessmentAgent",
+            intent="Evaluate baseline student quiz submission for conceptual vs. procedural misconceptions and calculate text readability.",
+            planned_tools=["analyze_readability", "generate_diagnostic_quiz"],
+            expected_outcome="Accurate Diagnostic AssessmentReport highlighting foundational skill gaps.",
+        )
         report: AssessmentReport = self.intake_agent.evaluate_quiz(submission, profile, tracer=tracer)
 
         # 3. Check Assessment HITL Policy
@@ -70,8 +75,14 @@ class EduPathwaySupervisor:
                 notes=hitl_assessment.proposed_change,
             )
 
-        # 4. Curriculum Synthesizer Agent
+        # 4. Declare Intent & Run Curriculum Synthesizer Agent
         tracer.record_state_transition("DIAGNOSTIC_ASSESSMENT", "CURRICULUM_SYNTHESIS")
+        tracer.record_intent(
+            agent_name="CurriculumSynthesizerAgent",
+            intent="Synthesize scaffolded, standards-aligned lesson plan embedding IEP accommodations and high-interest analogies.",
+            planned_tools=["lookup_educational_standards", "validate_iep_accommodations", "export_lesson_plan"],
+            expected_outcome="Fully structured LessonPlan with verified accommodation compliance.",
+        )
         lesson: LessonPlan = self.curriculum_agent.synthesize_lesson(report, profile, tracer=tracer)
 
         # 5. Check Curriculum HITL Policy
@@ -87,7 +98,8 @@ class EduPathwaySupervisor:
             lesson.hitl_reason = hitl_curriculum.trigger_reason
 
         # 6. Export Lesson Plan Artifacts
-        exported_path = export_lesson_plan(lesson.model_dump(), output_dir="data/lessons")
+        export_result = export_lesson_plan(lesson.model_dump(), output_dir="data/lessons")
+        exported_path = export_result.get("markdown_path", "") if isinstance(export_result, dict) else str(export_result)
 
         # 7. Finalize trace
         tracer.record_state_transition("CURRICULUM_SYNTHESIS", "READY_FOR_TUTORING")
@@ -117,6 +129,14 @@ class EduPathwaySupervisor:
         profile = self.profile_store.get_profile(student_id)
         if not profile:
             raise ValueError(f"Student '{student_id}' not found.")
+
+        if tracer:
+            tracer.record_intent(
+                agent_name="SocraticTutorAgent",
+                intent="Provide Socratic guided scaffolding without revealing the direct solution.",
+                planned_tools=[],
+                expected_outcome="Encouraging hint matching the student's current attempt tier.",
+            )
 
         response = self.tutor_agent.interact(
             student_message=student_message,
