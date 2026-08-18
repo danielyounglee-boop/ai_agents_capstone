@@ -1,0 +1,80 @@
+[
+  {
+    "student_id": "leo_m",
+    "name": "Leo Martinez",
+    "grade_level": 5,
+    "reading_grade_level": 3.6,
+    "primary_disability_or_focus": "Dyslexia and ADHD",
+    "interests": ["Space Exploration", "Mars Rovers", "Robotics", "Lego"],
+    "accommodations": [
+      {
+        "category": "visual_scaffolding",
+        "description": "Provide visual fraction bar diagrams and number lines for all abstract concepts.",
+        "guidelines": ["Include diagrams with every step", "Color code numerator vs denominator"]
+      },
+      {
+        "category": "chunked_instructions",
+        "description": "Break multi-step math problems into numbered discrete sub-steps (max 2 steps at a time).",
+        "guidelines": ["Step 1: convert", "Step 2: add"]
+      },
+      {
+        "category": "high_interest_analogy",
+        "description": "Ground abstract concepts in space mission or robotic engineering metaphors.",
+        "guidelines": ["Use space fuel tanks for fraction parts"]
+      },
+      {
+        "category": "scaffolded_hinting",
+        "description": "Use 3-tier guided questioning without giving away answers directly.",
+        "guidelines": ["Tier 1 conceptual", "Tier 2 procedural", "Tier 3 worked sub-step"]
+      }
+    ],
+    "mastery_vectors": {
+      "whole_numbers_addition": {
+        "topic_id": "whole_numbers_addition",
+        "topic_name": "Whole Number Addition",
+        "mastery_score": 0.95,
+        "attempts_count": 10
+      },
+      "fractions_like_denominators": {
+        "topic_id": "fractions_like_denominators",
+        "topic_name": "Fractions With Like Denominators",
+        "mastery_score": 0.85,
+        "attempts_count": 6
+      },
+      "fractions_unlike_denominators": {
+        "topic_id": "fractions_unlike_denominators",
+        "topic_name": "Fractions With Unlike Denominators",
+        "mastery_score": 0.35,
+        "attempts_count": 3
+      }
+    }
+  },
+  {
+    "student_id": "maya_k",
+    "name": "Maya Patel",
+    "grade_level": 4,
+    "reading_grade_level": 4.0,
+    "primary_disability_or_focus": "Auditory Processing & Working Memory",
+    "interests": ["Marine Biology", "Dolphins", "Ocean Reefs"],
+    "accommodations": [
+      {
+        "category": "visual_scaffolding",
+        "description": "Visual coral reef charts and step diagrams.",
+        "guidelines": ["Use ocean graphics"]
+      },
+      {
+        "category": "simplified_vocabulary",
+        "description": "Provide explicit glossary terms for all technical vocabulary.",
+        "guidelines": ["Define terms in plain language"]
+      }
+    ],
+    "mastery_vectors": {
+      "reading_inference": {
+        "topic_id": "reading_inference",
+        "topic_name": "Textual Inference & Evidence",
+        "mastery_score": 0.5,
+        "attempts_count": 2
+      }
+    }
+  }
+]

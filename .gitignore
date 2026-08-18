@@ -43,3 +43,8 @@ ENV/
 # OS artifacts
 .DS_Store
 Thumbs.db
+
+# Runtime Traces & Test Caches
+traces/
+.pytest_cache/
+

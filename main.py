@@ -1,48 +1,44 @@
-"""Entry point for the AI Agent."""
-
 import os
 import sys
-from dotenv import load_dotenv
-from rich.console import Console
-from rich.panel import Panel
 
-from ai_agents_capstone.agent import get_client, run_agent_turn
+# Ensure project root is in sys.path
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-# Load environment variables from .env
-load_dotenv()
-
-console = Console()
+from src.ai_agents_capstone.ui.cli import EduPathwayCLI
+from src.ai_agents_capstone.orchestration.supervisor import EduPathwaySupervisor
+from src.ai_agents_capstone.models.assessment import QuizSubmission, QuestionResponse
 
 
 def main():
-    console.print(Panel.fit("[bold green]5-Day AI Agents Intensive Capstone Agent[/bold green]\n[dim]Powered by Google Gemini 2.5[/dim]"))
-    
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key or api_key == "your_gemini_api_key_here":
-        console.print("[bold red]Error:[/bold red] GEMINI_API_KEY is not configured.")
-        console.print("Please add your Gemini API Key in [yellow].env[/yellow] file.")
-        sys.exit(1)
-
-    client = get_client()
-    console.print("[cyan]Agent initialized and ready. Type 'exit' or 'quit' to quit.[/cyan]\n")
-
-    while True:
-        try:
-            user_input = console.input("[bold blue]User > [/bold blue]")
-            if not user_input.strip():
-                continue
-            if user_input.lower() in ("exit", "quit", "q"):
-                console.print("[italic]Goodbye![/italic]")
-                break
-
-            console.print("[dim]Thinking...[/dim]")
-            response = run_agent_turn(client, user_input)
-            console.print(f"[bold green]Agent >[/bold green] {response}\n")
-        except KeyboardInterrupt:
-            console.print("\n[italic]Session terminated.[/italic]")
-            break
-        except Exception as e:
-            console.print(f"[bold red]Error:[/bold red] {e}\n")
+    """Main CLI execution router."""
+    if len(sys.argv) > 1 and sys.argv[1] == "--demo":
+        print("Running EduPathway AI Automated Demo Pipeline...")
+        supervisor = EduPathwaySupervisor()
+        submission = QuizSubmission(
+            student_id="leo_m",
+            quiz_id="quiz_fractions_addition_gr5",
+            subject="Mathematics",
+            topic="fractions_addition_unlike_denominators",
+            grade_target=5,
+            responses=[
+                QuestionResponse(
+                    question_id="diag_frac_01",
+                    question_text="What is 1/2 + 1/4?",
+                    target_concept="finding common denominators",
+                    student_answer="2/6",
+                    correct_answer="3/4",
+                    student_work_steps="I added across: 1+1=2 and 2+4=6",
+                )
+            ],
+        )
+        result = supervisor.run_full_diagnostic_and_curriculum_flow(submission)
+        print(f"✅ Demo execution complete! Session: {result['session_id']}")
+        print(f"📄 Exported Lesson Plan: {result['exported_lesson_path']}")
+        print(f"📊 Trace File: {result['trace_filepath']}")
+        print("\n" + result["trace_summary"])
+    else:
+        cli = EduPathwayCLI()
+        cli.run_interactive_menu()
 
 
 if __name__ == "__main__":

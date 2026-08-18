@@ -1,0 +1,13 @@
+services:
+  edupathway-ai:
+    build: .
+    container_name: edupathway-ai
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-in-5-days-dyl-temp}
+      - GCP_LOCATION=${GCP_LOCATION:-us-central1}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+      - ./traces:/app/traces
+    stdin_open: true
+    tty: true

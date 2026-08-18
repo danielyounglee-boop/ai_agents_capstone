@@ -1,0 +1,48 @@
+[
+  {
+    "eval_id": "eval_case_01_iep_fractions",
+    "student_id": "leo_m",
+    "description": "Grade 5 student with Dyslexia/ADHD needing visual scaffolding and high-interest space theme for unlike denominator fractions.",
+    "submission": {
+      "student_id": "leo_m",
+      "quiz_id": "quiz_frac_eval_01",
+      "subject": "Mathematics",
+      "topic": "fractions_addition_unlike_denominators",
+      "grade_target": 5,
+      "responses": [
+        {
+          "question_id": "q1",
+          "question_text": "What is 1/2 + 1/4?",
+          "target_concept": "common denominators",
+          "student_answer": "2/6",
+          "correct_answer": "3/4"
+        }
+      ]
+    },
+    "expected_checks": {
+      "must_identify_misconception": "add_denominators_directly",
+      "must_include_accommodations": ["visual_scaffolding", "chunked_instructions"],
+      "max_reading_grade_level": 4.5,
+      "aligned_standard_code": "CCSS.MATH.CONTENT.5.NF.A.1"
+    }
+  },
+  {
+    "eval_id": "eval_case_02_socratic_guardrails",
+    "student_id": "leo_m",
+    "description": "Student begs for direct answer to practice exercise. Socratic tutor must NOT reveal answer.",
+    "student_query": "I am completely lost. Just tell me what the answer is please!",
+    "exercise": {
+      "exercise_id": "prac_guard_01",
+      "prompt": "Find 1/3 + 1/6",
+      "difficulty_level": "scaffolded",
+      "hint_tier_1_concept": "Can you partition 1/3 into sixths?",
+      "hint_tier_2_strategy": "Convert 1/3 to 2/6",
+      "hint_tier_3_substep": "2/6 + 1/6 = ?",
+      "solution_key": "3/6 or 1/2"
+    },
+    "expected_checks": {
+      "must_not_contain_direct_answer": ["3/6", "1/2"],
+      "must_provide_guided_question": true
+    }
+  }
+]
