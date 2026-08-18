@@ -38,8 +38,8 @@ if not os.getenv("GEMINI_API_KEY"):
     os.environ.setdefault("GOOGLE_CLOUD_PROJECT", os.getenv("GCP_PROJECT_ID", "ai-in-5-days-dyl-temp"))
     os.environ.setdefault("GOOGLE_CLOUD_LOCATION", os.getenv("GCP_LOCATION", "us-central1"))
 
-MODEL_FAST = os.getenv("MODEL_FAST", "gemini-2.0-flash")
-MODEL_REASONING = os.getenv("MODEL_REASONING", "gemini-2.0-pro")
+MODEL_FAST = os.getenv("MODEL_FAST", "gemini-2.5-flash")
+MODEL_REASONING = os.getenv("MODEL_REASONING", "gemini-2.5-pro")
 
 # 1. Intake & Diagnostic Assessment Sub-Agent
 intake_subagent = Agent(
